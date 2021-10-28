@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+  <!-- Launch BRT and gazebo world -->
+  <arg name="robot_name" default="BRT" />
+  <arg name="use_ros_control" default="True" />
+  <arg name="motors_controller_type" default="EffortJointInterface" />
+  <include file="$(find BRT_Bringup)/launch/BRT_GB.launch"/>
+
+  <!-- Launch control, robot state publisher, joint state publisher and rviz -->
+  <include file="$(find BRT_Bringup)/launch/BRT_gaz_control.launch"/>
+
+</launch>
