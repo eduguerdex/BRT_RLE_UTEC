@@ -6,7 +6,7 @@ import rospy
 from sensor_msgs.msg import JointState
 
 from markers import *
-from functions import *
+from BraccioDEV import *
 
 # Initialize the node
 rospy.init_node("testKineControlPosition")
@@ -23,15 +23,15 @@ bmarker_current  = BallMarker(color['RED'])
 bmarker_desired = BallMarker(color['GREEN'])
 
 # Joint names
-jnames = ['base-0_joint', '0-1_joint', '1-2_joint','2-4_joint', '4-5_joint', '5-6_joint']
+jnames = ['base_joint','shoulder_joint', 'elbow_joint', 'wrist_pitch_joint','wrist_roll_joint']
 
 # Desired position
-xd = np.array([1.6, 0, 1.2])
+xd = np.array([-0.19, 0, 0.201])
 # Initial configuration
-q0  = np.array([0.0, 0, 0, 0, 0, 0.0])
+q0 = np.array([1.57,3.14,0,1.57,1.57])
 
 # Resulting initial position (end effector with respect to the base link)
-T = fkine(q0)
+T = fkine_BRT(q0)
 x0 = T[0:3,3]
 
 # Red marker shows the achieved position
@@ -62,7 +62,7 @@ while not rospy.is_shutdown():
     # -----------------------------
     epsilon = np.array([0.01, 0.01, 0.01])
     k = 0.5
-    Td = fkine(q)
+    Td = fkine_BRT(q)
     # Posicion
     x = Td[0:3, 3]
     # error
@@ -70,7 +70,7 @@ while not rospy.is_shutdown():
     # Ley de control
     de = -k*e
     # Jacobiano
-    J = jacobian_position(q,delta = 0.0001)
+    J = jacobian_BRT(q,delta = 0.01)
     dq = np.linalg.pinv(J).dot(de)
     # Integracion
     q = q + dt*dq
@@ -82,7 +82,7 @@ while not rospy.is_shutdown():
     fxcurrent.write(str(x[0])+' '+str(x[1]) +' '+str(x[2])+'\n')
     fxdesired.write(str(xd[0])+' '+str(xd[1])+' '+str(xd[2])+'\n')
     fq.write(str(q[0])+" "+str(q[1])+" "+str(q[2])+" "+str(q[3])+" "+
-             str(q[4])+" "+str(q[5])+"\n")
+             str(q[4])+"\n")
     
     # Publish the message
     jstate.position = q
@@ -93,6 +93,12 @@ while not rospy.is_shutdown():
     rate.sleep()
 
 print('ending motion ...')
+print("Posicion deseada")
+print(xd)
+print("Posicion y orientacion del efector final")
+print(np.round(Td,3))
+print("Configuracion articular")
+print(np.round(q,2))
 fxcurrent.close()
 fxdesired.close()
 fq.close()
