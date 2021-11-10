@@ -1,0 +1,223 @@
+#!/usr/bin/env python
+import rospy
+import time
+from std_msgs.msg import Float64
+from std_msgs.msg import Float64MultiArray
+from BraccioDEV import *
+
+def fkine_BRT(q):
+    """
+    Calcular la cinematica directa del robot UR5 dados sus valores articulares. 
+    q es un vector numpy de la forma [q1, q2, q3, q4, q5, q6]
+    """
+    # Longitudes (en metros)
+
+    # Matrices DH (completar), emplear la funcion dh con los parametros DH para cada articulacion
+    m=100
+    l1=(7.5/m)
+    l2=(12.5/m)
+    l3=(12.5/m)
+    l4=(6.5/m)
+    l5=(13/m)
+    # Matrices DH
+    T1=dh(l1 ,-q[0]-pi/2 ,0,-pi/2)#listo
+    T2=dh(0,q[1]+pi,l2,0)
+    T3=dh(0,q[2]-pi/2,l3,0)
+    T4=dh(0,q[3],0 ,pi/2) #listo
+    T5=dh(l4+l5,-q[4] ,0 ,0     )#listo
+    
+    # Efector final con respecto a la base
+    T = T1.dot(T2).dot(T3).dot(T4).dot(T5)
+    return T
+
+def jacobian_BRT(q, delta=0.0001):
+    # Crear una matriz 3x5
+    J = np.zeros((3,5))
+    # Transformacion homogenea inicial (usando q)
+    T = fkine_BRT(q)    
+    # Iteracion para la derivada de cada columna
+    for i in range(5):
+        # Copiar la configuracion articular inicial
+        dq = copy(q)
+        # Incrementar la articulacion i-esima usando un delta
+        dq[i]=dq[i]+delta
+        # Transformacion homogenea luego del incremento (q+delta)
+        Ti=fkine_BRT(dq)
+        # Aproximacion del Jacobiano de posicion usando diferencias finitas
+        J[0,i]= (Ti[0][3]-T[0][3])/delta;
+        J[1,i]= (Ti[1][3]-T[1][3])/delta;
+        J[2,i]= (Ti[2][3]-T[2][3])/delta;        
+    return J
+
+
+# Initialize the node
+rospy.init_node("sendJointsGzNode")
+
+print('starting motion ... ')
+# Posicion esperada
+xd = np.array([0, 0, 0.39])
+
+m1=1.57
+m2=3.14
+m3=0
+m4=0
+m5=1.57
+m6=1.15
+
+topic1 = '/robot/joint1_position_controller/command'
+topic2 = '/robot/joint2_position_controller/command'
+topic3 = '/robot/joint3_position_controller/command'
+topic4 = '/robot/joint4_position_controller/command'
+topic5 = '/robot/joint5_position_controller/command'
+topic6 = '/robot/gripper/command'
+topicg = '/robot/joint6_position_controller/command'
+
+pub1 = rospy.Publisher(topic1, Float64, queue_size=10, latch=True)
+pub2 = rospy.Publisher(topic2, Float64, queue_size=10, latch=True)
+pub3 = rospy.Publisher(topic3, Float64, queue_size=10, latch=True)
+pub4 = rospy.Publisher(topic4, Float64, queue_size=10, latch=True)
+pub5 = rospy.Publisher(topic5, Float64, queue_size=10, latch=True)
+pubg = rospy.Publisher(topicg, Float64, queue_size=10, latch=True)
+pub6 = rospy.Publisher(topic6, Float64MultiArray, queue_size=10, latch=True)
+    
+j1 = Float64()
+j2 = Float64()
+j3 = Float64()
+j4 = Float64()
+j5 = Float64()
+jg = Float64()
+j6 = Float64MultiArray()
+
+j1.data=m1
+j2.data=m2
+j3.data=m3
+j4.data=m4
+j5.data=m5
+j6.data=m6
+
+pub1.publish(j1)
+pub2.publish(j2)
+pub3.publish(j3)
+pub4.publish(j4)
+pub5.publish(j5)
+pubg.publish(jg)
+pub6.publish(j6)
+
+# Initial configuration
+q0 = np.array([m1,m2,m3,m4,m5])
+
+
+# Resulting initial position (end effector with respect to the base link)
+T = fkine_BRT(q0)
+x0 = T[0:3,3]
+
+print("Posicion deseada")
+print(xd)
+print("Posicion inicial y orientacion del efector final")
+print(np.round(T,3))
+q = copy(q0)
+
+freq = 200
+dt = 1.0/freq
+error=1
+# Main loop
+while not error<0.001:
+    # Kinematic control law for position (complete here)
+    # -----------------------------
+    epsilon = np.array([0.0001, 0.0001, 0.0001])
+    k = 0.5
+    Td = fkine_BRT(q)
+    # Posicion
+    x = Td[0:3, 3]
+    # error
+    e = (x - xd)
+    error=e[0]+e[1]+e[2]
+    error=abs(error)
+    # Ley de control
+    de = -k*e
+    # Jacobiano
+    J = jacobian_BRT(q,delta = 0.0001)
+    dq = np.linalg.pinv(J).dot(de)
+    # Integracion
+    q = q + dt*dq
+    print("Error") 
+    print(error) 
+    time.sleep(0.0000001)
+
+print('ending motion ...')
+print("Posicion final y orientacion del efector final")
+print(np.round(Td,3))
+print("Configuracion articular")
+q =np.round(q,3)
+print(q)
+
+
+if __name__ == "__main__":
+
+
+    topic1 = '/robot/joint1_position_controller/command'
+    topic2 = '/robot/joint2_position_controller/command'
+    topic3 = '/robot/joint3_position_controller/command'
+    topic4 = '/robot/joint4_position_controller/command'
+    topic5 = '/robot/joint5_position_controller/command'
+    topic6 = '/robot/gripper/command'
+    topicg = '/robot/joint6_position_controller/command'
+    pub1 = rospy.Publisher(topic1, Float64, queue_size=10, latch=True)
+    pub2 = rospy.Publisher(topic2, Float64, queue_size=10, latch=True)
+    pub3 = rospy.Publisher(topic3, Float64, queue_size=10, latch=True)
+    pub4 = rospy.Publisher(topic4, Float64, queue_size=10, latch=True)
+    pub5 = rospy.Publisher(topic5, Float64, queue_size=10, latch=True)
+    pubg = rospy.Publisher(topicg, Float64, queue_size=10, latch=True)
+    pub6 = rospy.Publisher(topic6, Float64MultiArray, queue_size=10, latch=True)
+    
+    j1 = Float64()
+    j2 = Float64()
+    j3 = Float64()
+    j4 = Float64()
+    j5 = Float64()
+    jg = Float64()
+    j6 = Float64MultiArray()
+
+    m1=[1.57,1.57,0   ,0   ,0   ,1.57]
+    m2=[1.1 ,1.1,1.57 ,1.57,1.57,1.57]
+    m3=[0.6 ,0.6 ,0.5 ,0   ,0   ,1.57]
+    m4=[0   ,0   ,0.7 ,0.7 ,0.7 ,1.57]
+    m5=[1.57,1.57,0   ,1.57,1.57,1.57]
+    m6=[0.5 ,3.1 ,3.1 ,3.1 ,0.5 ,1.57]
+
+    i=0
+    j=0
+    rate = rospy.Rate(5)
+    while i <len(m1):
+        while j <len(q):
+            if q[j]<0:
+                q[j]=0
+            if q[j]>3.14:
+                q[j]=3.14
+            j+=1
+
+        j1.data = q[0]
+        j2.data = q[1]
+        j3.data = q[2]
+        j4.data = q[3]
+        j5.data = q[4]
+        j6.data = [m6[i], m6[i]]
+        jg.data = m6[i]
+
+        MOVE=[j1,j2,j3,j4,j5,jg]
+        print('MOVE')
+        print(MOVE)
+
+        pub1.publish(j1)
+        pub2.publish(j2)
+        pub3.publish(j3)
+        pub4.publish(j4)
+        pub5.publish(j5)
+        pubg.publish(jg)
+        pub6.publish(j6)
+
+        time.sleep(5)
+        i+=1
+
+    while not rospy.is_shutdown():
+        rate.sleep()
