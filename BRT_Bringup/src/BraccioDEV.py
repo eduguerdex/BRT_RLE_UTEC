@@ -3,29 +3,6 @@ from copy import copy
 #import rbdl
 cos=np.cos; sin=np.sin; pi=np.pi
 
-#class Robot(object):
-#    def __init__(self, q0, dq0, ndof, dt):
-#        self.q = q0    # numpy array (ndof x 1)
-#        self.dq = dq0  # numpy array (ndof x 1)
-#        self.M = np.zeros([ndof, ndof])
-#        self.b = np.zeros(ndof)
-#       self.dt = dt
-#        self.robot = rbdl.loadModel('../urdf/robot_c.urdf')
-
-#    def send_command(self, tau):
-#        rbdl.CompositeRigidBodyAlgorithm(self.robot, self.q, self.M)
-#        rbdl.NonlinearEffects(self.robot, self.q, self.dq, self.b)
-#        ddq = np.linalg.inv(self.M).dot(tau-self.b)
-#        self.q = self.q + self.dt*self.dq
-#        self.dq = self.dq + self.dt*ddq
-
-#    def read_joint_positions(self):
-#       return self.q
-
-#    def read_joint_velocities(self):
-#       return self.dq
-
-
 def dh(d, theta, a, alpha):
     """
     Matriz de transformacion homogenea asociada a los parametros DH.
@@ -81,9 +58,7 @@ def jacobian_BRT(q, delta=0.0001):
         # Transformacion homogenea luego del incremento (q+delta)
         Ti=fkine_BRT(dq)
         # Aproximacion del Jacobiano de posicion usando diferencias finitas
-        J[0,i]= (Ti[0][3]-T[0][3])/delta;
-        J[1,i]= (Ti[1][3]-T[1][3])/delta;
-        J[2,i]= (Ti[2][3]-T[2][3])/delta;        
+        J[:,i]= 1/delta*(Ti[0:3,3]-T[0:3,3])    
     return J
 
 def ikine_BRT(xdes, q0):
@@ -92,16 +67,66 @@ def ikine_BRT(xdes, q0):
     """    
     epsilon  = 0.0001
     max_iter = 1000
+    delta=0.0001
    
     q  = copy(q0)
     for i in range(max_iter):
             # Main loop
-            J=jacobian_BRT(q)           
+            J=jacobian_BRT(q,delta)           
             f=fkine_BRT(q)
             e=xdes-f[0:3,3]
             q=q+np.dot(np.linalg.pinv(J), e)
             #Condicion de termino
             if (np.linalg.norm(e)<epsilon):
                 break            
-            
+            pass
+    return q
+
+def ik_gradient_BRT(xdes, q0):
+
+    """
+
+    Calcular la cinematica inversa de UR5 numericamente a partir de la configuracion articular inicial de q0. 
+
+    Emplear el metodo gradiente
+
+    """
+
+    epsilon  = 0.001
+    max_iter = 1000
+    delta    = 0.00001
+    alpha    = 0.5
+    q  = copy(q0)
+
+    for i in range(max_iter):
+
+        # Main loop
+
+        #Matriz Jacobiana
+
+        J=jacobian_BRT(q,delta)
+
+        #Matriz Actual
+
+        Td=fkine_BRT(q)
+
+        #Posicion Actual
+
+        xact=Td[0:3,3]
+
+        # Error entre pos deseada y pos actual
+
+        e=xdes-xact
+
+        # Metodo de Newton
+
+        q=q+alpha*np.dot(J.T,e)
+
+        #Condicion de termino
+
+        if(np.linalg.norm(e)<epsilon):
+
+            break
+
+        pass
     return q

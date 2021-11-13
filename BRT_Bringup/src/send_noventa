@@ -6,7 +6,6 @@ from std_msgs.msg import Float64MultiArray
 from BraccioDEV import*
 
 if __name__ == "__main__":
-
     rospy.init_node("sendJointsGzNode")
     topic1 = '/robot/joint1_position_controller/command'
     topic2 = '/robot/joint2_position_controller/command'
@@ -32,13 +31,12 @@ if __name__ == "__main__":
     j6 = Float64MultiArray()
 
 
-    m1=3.14
-    m2=0.75
-    m3=3.1415
-    m4=3.14
-    m5=0
-    m6=3.15
-
+    m1=0
+    m2=1.57
+    m3=1.57
+    m4=1.57
+    m5=1.57
+    m6=1.57
     j1.data = m1
     j2.data = m2
     j3.data = m3
@@ -57,14 +55,24 @@ if __name__ == "__main__":
 
 # Initial configuration
     q0 = np.array([m1,m2,m3,m4,m5])
-
+# Initial configuration
+    ms1=np.round(m1*180/3.1415,1)
+    ms2=np.round(m2*180/3.1415,1)
+    ms3=np.round(m3*180/3.1415,1)
+    ms4=np.round(m4*180/3.1415,1)
+    ms5=np.round(m5*180/3.1415,1)
+    ms6=np.round(m6*180/3.1415,1)
+    k = np.array([ms1,ms2,ms3,ms4,ms5])
+    print("Angulos accionados")
+    print(np.round(k,3))
 
 # Resulting initial position (end effector with respect to the base link)
     T = fkine_BRT(q0)
     x0 = T[0:3,3]
-
     print("Posicion inicial y orientacion del efector final")
     print(np.round(T,3))
+    
+
 
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
