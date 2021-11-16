@@ -1,0 +1,8 @@
+type: "position_controllers/JointGroupPositionController"
+joints:
+  - gripper_joint
+  - sub_gripper_joint
+robot:
+  pid_gains:
+    gripper_joint: {p: 10000.0, i: 1.0, d: 10.0}
+    sub_gripper_joint: {p: 10000.0, i: 1.0, d: 10.0}
