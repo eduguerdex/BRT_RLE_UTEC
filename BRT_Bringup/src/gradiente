@@ -11,9 +11,9 @@ rospy.init_node("sendJointsGzNode")
 print('starting motion ... ')
 # Posicion esperada
 # X, Y, Z
-xd = np.array([0.18, 0, 0.13])
+xd = np.array([0.18, 0, 0.12])
 
-m1=0
+m1=1.57
 m2=0.75
 m3=3.1415
 m4=3.14
@@ -61,7 +61,7 @@ pubg.publish(jg)
 pub6.publish(j6)
 
 # Initial configuration
-q0 = np.array([m1,m2,m3,m4,m5])
+q0 = np.array([1.578,1.578,1.578,1.578,1.578])
 
 # Resulting initial position (end effector with respect to the base link)
 T = fkine_BRT(q0)
@@ -72,7 +72,7 @@ print(xd)
 print("Posicion inicial y orientacion del efector final")
 print(np.round(T,3))
 
-q=ikine_BRT(xd, q0)
+q=ik_gradient_BRT(xd, q0)
 
 print('ending motion ...')
 print("Posicion final y orientacion del efector final")
@@ -98,7 +98,7 @@ print("ractual")
 print(np.round(ractual,3))
 
 if ractual>rmax:
-	q0 = np.array([1.578,1.578,1.578,1.578,1.578])
+	q = np.array([m1,m2,m3,m4,m5])
 
 if __name__ == "__main__":
 
@@ -172,8 +172,7 @@ if __name__ == "__main__":
 	print("Posicion final y orientacion del efector final")
 	Tfinal = fkine_BRT(JMOVE)
 	print(np.round(Tfinal,2))
-    print("Posicion deseada")
-    print(xd)
 
+    
         rate.sleep()
 	break
