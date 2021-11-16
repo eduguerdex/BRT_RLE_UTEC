@@ -147,7 +147,7 @@
         </inertial>
     </link>
 
-<link name="left_gripper_link">
+    <link name="left_gripper_link">
         <visual>
             <geometry>
                 <mesh filename="package://BRT_Description/stl/braccio_left_gripper.stl" scale="0.001 0.001 0.001" />
@@ -342,7 +342,7 @@
         </actuator>
     </transmission> 
     
-     <link name="world"/>
+    <link name="world"/>
     <joint name="world_joint" type="fixed">
         <parent link="world"/>
         <child link="base_link"/>
@@ -388,28 +388,115 @@
   </gazebo>
   <gazebo reference="right_gripper_link">
     <material>Gazebo/White</material>
-    <selfCollide>true</selfCollide>
-    <kp>100000.0</kp>
-    <kd>1.0</kd>
-    <mu1>500.0</mu1>
-    <mu2>200.0</mu2>
-    <minDepth>0.002</minDepth>
-    <maxVel>0</maxVel>
+    <mu1>0.5</mu1>
+    <mu2>0.5</mu2>
+    <kp>500000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+    <fdir1>1 0 0</fdir1>
   </gazebo>
   <gazebo reference="left_gripper_link">
     <material>Gazebo/White</material>
-    <selfCollide>true</selfCollide>
-    <kp>100000.0</kp>
-    <kd>1.0</kd>
-    <mu1>500.0</mu1>
-    <mu2>200.0</mu2>
-    <minDepth>0.002</minDepth>
-    <maxVel>0</maxVel>
+    <mu1>0.5</mu1>
+    <mu2>0.5</mu2>
+    <kp>500000.0</kp>
+    <kd>10.0</kd>
+    <minDepth>0.001</minDepth>
+    <maxVel>0.1</maxVel>
+    <fdir1>1 0 0</fdir1>
   </gazebo>
   <gazebo reference="gripper_joint">
         <implicitSpringDamper>1</implicitSpringDamper>
     </gazebo>
   <gazebo reference="sub_gripper_joint">
      <implicitSpringDamper>1</implicitSpringDamper>
-  </gazebo>-->
+  </gazebo>
+ <!--INICIO DE RGB CAMERA-->
+    <joint name="table_joint" type="fixed">
+        <parent link="world"/>
+        <child link="camera_link"/>
+        <origin rpy="0 0 -1.57" xyz="0.0 0.7 0.15"/>
+    </joint>
+
+    <link name="camera_link">
+        <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+            <box size="0.03 0.06 0.03"/>
+        </geometry>
+        </collision>
+
+        <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+            <box size="0.03 0.06 0.03"/>
+        </geometry>
+        <material name="black"/>
+        </visual>
+        <inertial>
+        <mass value="1e-5" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+        </inertial>
+    </link>
+
+    <joint name="camera_rgb_joint" type="fixed">
+        <origin xyz="0.003 0.011 0.009" rpy="0 0 0"/>
+        <parent link="camera_link"/>
+        <child link="camera_rgb_frame"/>
+    </joint>
+    <link name="camera_rgb_frame"/>
+
+    <joint name="camera_rgb_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+        <parent link="camera_rgb_frame"/>
+        <child link="camera_rgb_optical_frame"/>
+    </joint>
+    <link name="camera_rgb_optical_frame"/>
+
+    <gazebo reference="camera_link">
+        <sensor type="camera" name="usb_camera">
+        <update_rate>30.0</update_rate>
+        <camera name="usb">
+            <horizontal_fov>1.3962634</horizontal_fov>
+            <image>
+            <width>800</width>
+            <height>800</height>
+            <format>R8G8B8</format>
+            </image>
+            <clip>
+            <near>0.02</near>
+            <far>300</far>
+            </clip>
+            <noise>
+            <type>gaussian</type>
+            <!-- Noise is sampled independently per pixel on each frame. That pixel's noise value is added to each of its color channels, which at that point lie in the range [0,1]. -->
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+            </noise>
+        </camera>
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+            <alwaysOn>true</alwaysOn>
+            <updateRate>30.0</updateRate>
+            <cameraName>usb_camera</cameraName>
+            <imageTopicName>image_raw</imageTopicName>
+            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+            <frameName>camera_rgb_optical_frame</frameName>
+            <hackBaseline>0.07</hackBaseline>
+            <distortionK1>0.0</distortionK1>
+            <distortionK2>0.0</distortionK2>
+            <distortionK3>0.0</distortionK3>
+            <distortionT1>0.0</distortionT1>
+            <distortionT2>0.0</distortionT2>
+        </plugin>
+        </sensor>
+    </gazebo>
+
+    <gazebo reference="camera_link">
+        <material>Gazebo/Black</material>
+    </gazebo>
+
+
+
 </robot>
