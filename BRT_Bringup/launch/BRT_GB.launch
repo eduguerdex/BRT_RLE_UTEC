@@ -26,9 +26,16 @@
   <param name="robot_description"
          textfile="$(find BRT_Description)/urdf/BRT_Gazebo.urdf"/>
 
-  <!-- Spawn a URDF robot -->
+  
+  <!-- Spawn a URDF robot  -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false"
         output="screen"
-        args="-urdf -param robot_description -model robot -x 0 -y 0 -z 0"/>
+        args="-urdf -param robot_description -model robot -x 0 -y 0 -z 1.05
+        -J base_joint 1.57
+        -J shoulder_joint 1.57
+        -J elbow_joint 1.57
+        -J wrist_pitch_joint 1.57
+        -J wrist_roll_joint 1.57
+        -J gripper_joint 0"/>
 
 </launch>
