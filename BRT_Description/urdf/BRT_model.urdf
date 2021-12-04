@@ -131,7 +131,7 @@
     <link name="left_gripper_link">
         <visual>
             <geometry>
-                <mesh filename="package://BRT_Description/meshes/braccio_left_gripper.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://BRT_Description/meshes/braccio_left_gripper.stl" scale="0.01 0.01 0.01" />
             </geometry>
             <material name="white" />
             <origin rpy="0 1.5708 0" xyz="0 -0.012 0" />
@@ -146,14 +146,14 @@
         <collision>
             <origin rpy="0 1.5708 0" xyz="0 -0.012 0" />
             <geometry>
-                <mesh filename="package://BRT_Description/meshes/braccio_left_gripper.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://BRT_Description/meshes/braccio_left_gripper.stl" scale="0.01 0.01 0.01" />
             </geometry>
         </collision>
     </link>
     <link name="right_gripper_link">
         <visual>
             <geometry>
-                <mesh filename="package://BRT_Description/meshes/braccio_right_gripper.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://BRT_Description/meshes/braccio_right_gripper.stl" scale="0.01 0.01 0.01" />
             </geometry>
             <material name="white" />
             <origin rpy="0 1.5708 0" xyz="0 -0.012 0.010" />
@@ -168,7 +168,7 @@
         <collision>
             <origin rpy="0 1.5708 0" xyz="0 -0.012 0.010" />
             <geometry>
-                <mesh filename="package://BRT_Description/meshes/braccio_right_gripper.stl" scale="0.001 0.001 0.001" />
+                <mesh filename="package://BRT_Description/meshes/braccio_right_gripper.stl" scale="0.01 0.01 0.01" />
             </geometry>
         </collision>
     </link>
