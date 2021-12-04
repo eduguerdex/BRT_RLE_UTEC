@@ -10,12 +10,13 @@ rospy.init_node("sendJointsGzNode")
 
 print('starting motion ... ')
 # Posicion esperada
-# X, Y, Z
-xd = np.array([0.18, 0, 0.12])
+# X, Y, Z   -0.124  0.097
+
+xd = np.array([-0.086, -0.103 ,0.11])
 
 m1=1.57
-m2=0.75
-m3=3.1415
+m2=1.57
+m3=1.57
 m4=3.14
 m5=1.57
 m6=0
@@ -131,12 +132,12 @@ if __name__ == "__main__":
     m3=[0.6 ,0.6 ,0.5 ,0   ,0   ,1.57]
     m4=[0   ,0   ,0.7 ,0.7 ,0.7 ,1.57]
     m5=[1.57,1.57,0   ,1.57,1.57,1.57]
-    m6=[0.5 ,0.5 ,3.1 ,3.1 ,3.1,3.1]
+    m6=[0.5 ,0.5 ,3.1,3.1]
 
     i=0
     j=0
     rate = rospy.Rate(5)
-    while i <len(m1):
+    while i <len(m6):
         while j <len(q):
             if q[j]<0:
                 q[j]=0
@@ -157,10 +158,14 @@ if __name__ == "__main__":
         print('MOVE')
         print(MOVE)
         
+	for a in range(2):        
+		pub1.publish(j1)
+		time.sleep(1)
 
-        pub1.publish(j1)
         pub2.publish(j2)
+	time.sleep(1)
         pub3.publish(j3)
+	time.sleep(1)
         pub4.publish(j4)
         pub5.publish(j5)
         pubg.publish(jg)

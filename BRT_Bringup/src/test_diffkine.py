@@ -25,8 +25,9 @@ bmarker_desired = BallMarker(color['GREEN'])
 # Joint names
 jnames = ['base_joint','shoulder_joint', 'elbow_joint', 'wrist_pitch_joint','wrist_roll_joint']
 
-# Desired position
-xd = np.array([-0.19, 0, 0.201])
+# Desired position     [-0.068, 0.086, 0.11]
+
+xd = np.array([0.17,0.124, 0.11])
 # Initial configuration
 q0 = np.array([1.57,3.14,0,1.57,1.57])
 

@@ -36,7 +36,7 @@ if __name__ == "__main__":
     m3=1.57
     m4=1.57
     m5=1.57
-    m6=1.57
+    m6=0
     j1.data = m1
     j2.data = m2
     j3.data = m3

@@ -10,18 +10,6 @@ def callback(markers):
        global posy
        global posz
        for m in markers.markers:
-           marker_id = m.id
-           if (marker_id == 0):
-               marker_pose = m.pose.pose
-               pos = marker_pose.position
-               ori = marker_pose.orientation
-               posx=pos.x
-               posy=pos.y
-               posz=pos.z
-               #rospy.loginfo("marker[%d] position (x,y,z) = (%3.3f: %3.3f: %3.3f), orientation (x,y,z,w) = (%3.3f: %3.3f: %3.3f: %3.3f)" 
-               #           % (marker_id, pos.x, pos.y, pos.z, ori.x, ori.y, ori.z, ori.w))
-           else:
-               if (marker_id == 1):
                  marker_pose = m.pose.pose
                  pos = marker_pose.position
                  ori = marker_pose.orientation
@@ -33,27 +21,30 @@ def callback(markers):
 rospy.init_node('ar_pose_subscriber')
 sub = rospy.Subscriber("/ar_pose_marker", AlvarMarkers, callback)
 rate= rospy.Rate(1)
-
-camx=0.011
-camy=0.697
-camz=0.158
+ 
+camx=0.0
+camy=0.45
+camz=0.3
 caja=0.07
 
 while not rospy.is_shutdown():
     fx=camx-posx
     fz=camz-posy+caja
-    fy=camy-posz
+    fy=-(camy-posz)
 
     fx=np.round(fx,3)
     fy=np.round(fy,3)
     fz=np.round(fz,3)
-    xd=[fx,fy,fz]
+    if fz<0.1:
+	fz=0.11
+
+    xd=[fy,fx,fz]
     xm=[posx,posy,posz]
-    xcam=[camx,camy,camz+caja]
+    xcam=[-camy,camx,camz+caja]
 
     if np.array_equal(xd,xcam) == False:
         print("Posicion del base vs marcador")
-        print xd
+        print np.round(xd,3)
         print("Posicion del camara vs marcador")
         print xm
         break
