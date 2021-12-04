@@ -3,8 +3,9 @@
 <launch>
   <!--Joint controller configurations from YAML to parameter server --> 
   <rosparam file="$(find BRT_Description)/config/BRT_control.yaml" command="load"/>
+
   <!-- Load the controllers -->
-  <rosparam command="load" file="$(find BRT_Description)/config/gripper.yaml" ns="robot/gripper"/>
+  <rosparam command="load" file="$(find BRT_Description)/config/joint6_position_controller.yaml" ns="robot/joint6_position_controller"/>
   <node name="controller_spawner" pkg="controller_manager" type="spawner"
         respawn="false" output="screen" ns="/robot"
         args="joint1_position_controller
@@ -12,7 +13,7 @@
               joint3_position_controller
               joint4_position_controller
               joint5_position_controller
-              gripper
+              joint6_position_controller
               joint_state_controller"/>
 
   <!-- convert joint states to TF transforms for rviz, etc -->
@@ -20,6 +21,7 @@
         respawn="false" output="screen">
     <remap from="/joint_states" to="/robot/joint_states" />
   </node>
+
     <node pkg="rviz" type="rviz" name="rviz" required="true"
-        args="-d $(find BRT_Description)/config/robot-config.rviz"/>
+        args="-d $(find BRT_Description)/config/BRT_Cam.rviz"/>
 </launch>
