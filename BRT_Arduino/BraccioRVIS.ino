@@ -15,6 +15,8 @@
 /*  USO DIRECTO
 //rostopic pub joint_array std_msgs/Float32MultiArray '{data: [180,90,90,90,90,70]}' --once
 // rosrun rosserial_python serial_node.py /dev/ttyACM0
+ sudo chmod 777 /dev/ttyACM0
+
 */
 // ================================================================
 // ===         DECLARACION DE SERVO PARA BRACCIO                ===
