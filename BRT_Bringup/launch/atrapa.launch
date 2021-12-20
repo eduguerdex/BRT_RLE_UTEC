@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="node_start_delay" default="1.0" /> 
+  <node name="send_tocar" pkg="BRT_Bringup" type="send_tocar"/>
+<node name="send_atrapar" pkg="BRT_Bringup" type="send_atrapar" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' "/>
+  <node name="send_joints" pkg="BRT_Bringup" type="send_joints" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' "/>
+  <!--<node name="send_centro" pkg="BRT_Bringup" type="send_centro" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' "/>-->
+</launch>

@@ -29,9 +29,9 @@
         output="screen"
         args="-urdf -param robot_description -model robot -x 0 -y 0 -z 1.05
         -J base_joint 1.57
-        -J shoulder_joint 1.57
-        -J elbow_joint 1.57
-        -J wrist_pitch_joint 1.57
+        -J shoulder_joint 0.75
+        -J elbow_joint 3.14
+        -J wrist_pitch_joint 0
         -J wrist_roll_joint 1.57
         -J gripper_joint 0"/>
 </launch>
